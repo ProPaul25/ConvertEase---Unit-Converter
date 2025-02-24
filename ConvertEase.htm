@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f4f6f7;
+            --text-color: #2c3e50;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px 15px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            transition: transform 0.3s ease;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+        .category-select, .conversion-group input, .conversion-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .category-select:focus, .conversion-group input:focus, .conversion-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .conversion-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .conversion-group > * {
+            flex: 1;
+        }
+        .conversion-group span {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        #result {
+            text-align: center;
+            font-size: 22px;
+            color: var(--primary-color);
+            background-color: #f1f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .icon {
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-calculator icon"></i>Unit Converter</h1>
+        
+        <select id="category" class="category-select">
+            <option value="length">Length</option>
+            <option value="mass">Mass</option>
+            <option value="temperature">Temperature</option>
+            <option value="area">Area</option>
+            <option value="volume">Volume</option>
+            <option value="time">Time</option>
+            <option value="speed">Speed</option>
+            <option value="digital">Digital Storage</option>
+        </select>
+<br><br>
+        <div class="converter">
+            <div class="conversion-group">
+                <input type="number" id="inputValue" step="any" placeholder="Enter value">
+                <select id="fromUnit"></select>
+                <span>to</span>
+                <select id="toUnit"></select>
+            </div>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Previous JavaScript code remains unchanged
+        const units = {
+            length: {
+                meters: 1,
+                kilometers: 1000,
+                centimeters: 0.01,
+                millimeters: 0.001,
+                miles: 1609.34,
+                yards: 0.9144,
+                feet: 0.3048,
+                inches: 0.0254
+            },
+            // ... (rest of the units object remains the same)
+        };
+
+        const categorySelect = document.getElementById('category');
+        const fromUnitSelect = document.getElementById('fromUnit');
+        const toUnitSelect = document.getElementById('toUnit');
+        const inputValue = document.getElementById('inputValue');
+        const resultDiv = document.getElementById('result');
+
+        function populateUnits(category) {
+            const unitEntries = Object.entries(units[category]);
+            
+            fromUnitSelect.innerHTML = unitEntries.map(([unit]) => 
+                `<option value="${unit}">${unit}</option>`).join('');
+            
+            toUnitSelect.innerHTML = unitEntries.map(([unit]) => 
+                `<option value="${unit}">${unit}</option>`).join('');
+        }
+
+        function convertUnits() {
+            const category = categorySelect.value;
+            const fromUnit = fromUnitSelect.value;
+            const toUnit = toUnitSelect.value;
+            const value = parseFloat(inputValue.value);
+
+            if (isNaN(value)) {
+                resultDiv.textContent = 'Please enter a valid number';
+                return;
+            }
+
+            let result;
+            if (category === 'temperature') {
+                const toBase = units[category][fromUnit].toBase(value);
+                result = units[category][toUnit].fromBase(toBase);
+            } else {
+                const baseValue = value * units[category][fromUnit];
+                result = baseValue / units[category][toUnit];
+            }
+
+            resultDiv.textContent = `${value} ${fromUnit} = ${result.toFixed(4)} ${toUnit}`;
+        }
+
+        categorySelect.addEventListener('change', () => {
+            populateUnits(categorySelect.value);
+            convertUnits();
+        });
+
+        [inputValue, fromUnitSelect, toUnitSelect].forEach(element => {
+            element.addEventListener('input', convertUnits);
+        });
+
+        // Initialize
+        populateUnits(categorySelect.value);
+        convertUnits();
+    </script>
+</body>
+</html>
